@@ -7,6 +7,6 @@ export interface Pedido {
     cliente: Cliente;
     data: Date;
     valorTotal: number;
-    produto: Produto;
+    produtos: Produto[];
 
 }
