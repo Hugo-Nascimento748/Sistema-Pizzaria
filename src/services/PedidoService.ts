@@ -6,7 +6,7 @@ export class PedidoService{
     private pedidos: Pedido[] = [];
     private contadorId: number = 1;
 
-    adicionarPedido(cliente: Cliente, produtos: Produto[]){
+    adicionarPedido(cliente: Cliente, produtos: Produto[], data: Date){
         let valorTotal = 0;
         for (let i = 0; i < produtos.length; i++) {
             valorTotal += produtos[1].valor;            
@@ -24,6 +24,7 @@ export class PedidoService{
         this.contadorId++;
         this.pedidos.push(pedido);
         console.log(`O produto do cliente ${cliente.nome} foi adicionado. Valor Total: $${valorTotal}`);
+        return pedido;
 
     }
 

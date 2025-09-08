@@ -1,4 +1,5 @@
 import { Pedido } from "../models/Pedido";
+import { formatarData, formatarMoeda } from "../utils/Formatador";
 
 export class Recibo {
     static gerar(pedido: Pedido){
@@ -7,14 +8,13 @@ export class Recibo {
         console.log("=========================");
         console.log(`Cliente: ${pedido.cliente.nome}`);
         console.log(`Local de entrega: \n${pedido.cliente.endereco}`)
-        console.log(`Data: ${pedido.data}`);
+        console.log(`Data: ${formatarData(pedido.data)}`);
         console.log("-------------------------")
         console.log(`Produtos:`)
         
-        for (let i = 0; i < pedido.produtos.length; i++){   
-            const produto = pedido.produtos[1];
-            console.log(`- ${produto.nome} (R$${produto.valor})`);
-        }
-        console.log(`Total a pagar: ${pedido.valorTotal}`);
+        pedido.produtos.forEach(p => {
+            console.log(`${p.nome} - ${formatarMoeda(p.valor)}`);
+        });
+        console.log(`Total a pagar: ${formatarMoeda(pedido.valorTotal)}`);
     }
 }

@@ -21,7 +21,10 @@
   },
   "homepage": "https://github.com/Hugo-Nascimento748/Sistema-Pizzaria#readme",
   "devDependencies": {
+    "@types/readline-sync": "^1.4.8",
     "typescript": "^5.9.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  }
 }
