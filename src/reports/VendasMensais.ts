@@ -7,8 +7,10 @@ export class VendasMensais{
         const ano = data.getFullYear();
 
         const pedidosMes = pedidos.filter(pedido => {
+            return(
             data.getMonth() === mes &&
             data.getFullYear() === ano
+            );
         });
         let faturamento = 0;
         for (let i = 0; i < pedidosMes.length; i++){
