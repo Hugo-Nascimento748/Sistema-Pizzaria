@@ -14,7 +14,7 @@ const produtos: Produto[] = [];
 function adicionarCliente() {
     const nome = readline.question("Nome do cliente: ");
     const endereco = readline.question("Endereço: ");
-    const telefone = readline.question("Telefine: ");
+    const telefone = readline.question("Telefone: ");
     const id = clientes.length + 1;
     clientes.push({id, nome, telefone, endereco});
     console.log(`Cliente ${nome} adicionado!`);
