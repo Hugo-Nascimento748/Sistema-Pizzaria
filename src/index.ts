@@ -104,7 +104,7 @@ do {
 
     }
     else if (escolha === "2"){
-        console.log("Opção escolhida: Cadastrar Produto1");
+        console.log("Opção escolhida: Cadastrar Produto!");
         adicionarProduto();
     }
     else if (escolha === "3"){
