@@ -8,9 +8,10 @@ export class PedidoService{
 
     adicionarPedido(cliente: Cliente, produtos: Produto[], data: Date){
         let valorTotal = 0;
-        for (let i = 0; i < produtos.length; i++) {
-            valorTotal += produtos[1].valor;            
+        for (const produto of produtos) {
+        valorTotal += produto.valor;
         }
+
         console.log(`Valor Total: $${valorTotal}`);
 
         const pedido: Pedido = {
