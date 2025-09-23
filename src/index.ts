@@ -5,6 +5,7 @@ import { PedidoService } from "./services/PedidoService";
 import { Recibo } from "./reports/Recibo";
 import { VendasDiarias } from "./reports/VendasDiarias";
 import { VendasMensais } from "./reports/VendasMensais";
+import { HistoricoVendas } from "./reports/HistoricoVendas";
 
 const clienteService = new ClienteService();
 const produtoService = new ProdutoService();
@@ -220,7 +221,8 @@ do {
   console.log("3 - Criar Pedido");
   console.log("4 - Relatorio Diario");
   console.log("5 - Relatorio Mensal");
-  console.log("6 - Sair");
+  console.log("6 - Histórico de Vendas");
+  console.log("7 - Sair");
 
   const escolha = readline.question("Escolha uma opcao: ");
 
@@ -229,7 +231,10 @@ do {
   else if (escolha === "3") criarPedido();
   else if (escolha === "4") criarRelatorioDiario();
   else if (escolha === "5") criarRelatorioMensal();
-  else if (escolha === "6") { console.log("Saindo do sistema..."); break; }
+  else if (escolha === "6") {
+    console.log("======== Histórico de Vendas ========");
+    console.log(HistoricoVendas.listar());}
+  else if (escolha === "7") { console.log("Saindo do sistema..."); break; }
   else console.log("Opcao invalida!");
 
   continuar = readline.question("Deseja realizar outra operacao? (s/n): ").toLowerCase();

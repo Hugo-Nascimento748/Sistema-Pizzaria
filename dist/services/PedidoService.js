@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PedidoService = void 0;
+const HistoricoVendas_1 = require("../reports/HistoricoVendas");
 class PedidoService {
     constructor() {
         this.pedidos = [];
@@ -22,6 +23,8 @@ class PedidoService {
         this.contadorId++;
         this.pedidos.push(pedido);
         console.log(`O produto do cliente ${cliente.nome} foi adicionado. Valor Total: $${valorTotal}`);
+        // 🔥 REGISTRA NO HISTÓRICO DE VENDAS
+        HistoricoVendas_1.HistoricoVendas.registrar(pedido);
         return pedido;
     }
     listarPedidos() {

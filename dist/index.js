@@ -7,6 +7,7 @@ const PedidoService_1 = require("./services/PedidoService");
 const Recibo_1 = require("./reports/Recibo");
 const VendasDiarias_1 = require("./reports/VendasDiarias");
 const VendasMensais_1 = require("./reports/VendasMensais");
+const HistoricoVendas_1 = require("./reports/HistoricoVendas");
 const clienteService = new ClienteService_1.ClienteService();
 const produtoService = new ProdutoService_1.ProdutoService();
 const pedidoService = new PedidoService_1.PedidoService();
@@ -232,7 +233,8 @@ do {
     console.log("3 - Criar Pedido");
     console.log("4 - Relatorio Diario");
     console.log("5 - Relatorio Mensal");
-    console.log("6 - Sair");
+    console.log("6 - Histórico de Vendas");
+    console.log("7 - Sair");
     const escolha = readline.question("Escolha uma opcao: ");
     if (escolha === "1")
         menuClientes();
@@ -245,6 +247,10 @@ do {
     else if (escolha === "5")
         criarRelatorioMensal();
     else if (escolha === "6") {
+        console.log("======== Histórico de Vendas ========");
+        console.log(HistoricoVendas_1.HistoricoVendas.listar());
+    }
+    else if (escolha === "7") {
         console.log("Saindo do sistema...");
         break;
     }
