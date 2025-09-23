@@ -57,6 +57,15 @@ Sistema-Pizzaria/
 
 ---
 
+## ⚙️ Histórico de Vendas em CSV
+
+Cada pedido realizado é automaticamente salvo em um arquivo .csv.
+
+O arquivo contém colunas como: Data, Cliente, Produtos, Quantidade, Valor Total.
+
+Isso facilita análise externa em planilhas ou BI (Business Intelligence).
+
+
 ## ⚙️ Instruções de Instalação e Execução  
 
 ### 🔽 1. Clonar o repositório  
