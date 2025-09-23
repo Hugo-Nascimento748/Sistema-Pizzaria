@@ -7,7 +7,7 @@ Um sistema simples de gerenciamento de pizzaria feito em **TypeScript**, com fun
 ## 👥️ Integrantes 
 
 Hugo Nascimento Gonçalves - RA: 2509669
-Stefano de Paola Garcia Scudei - RA: 2503418
+Stefano de Paola Garcia Scuderi - RA: 2503418
 Alex Sandro Teles Silveira - RA: 2510122
 Pedro Pereira de Oliveira - RA: 2505860
 Caio Felipe Martins de Camargo - RA: 2522475
