@@ -33,7 +33,7 @@ cd "C:\caminho\da\pasta\do\projeto"
 #### 3.1. Se quiser rodar em JavaScript (.js)  
 No terminal, execute:
 ```bash
-node index.js
+node dist/index.js
 ```  
 Isso irá rodar seu projeto e você verá a saída diretamente no terminal.
 
@@ -46,14 +46,14 @@ npm install -g typescript ts-node
 
 Execute o arquivo TypeScript diretamente:  
 ```bash
-ts-node index.ts
+ts-node src/index.ts
 ```
 
 
 Alternativamente, você pode compilar para JavaScript e rodar com Node.js:  
 ```bash
 tsc index.ts  
-node index.js
+node dist/index.js
 ```
 
 
