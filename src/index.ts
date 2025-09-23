@@ -158,7 +158,7 @@ function criarPedido() {
 
   console.log("\nEscolha o cliente:");
   clientes.forEach(c => console.log(`${c.id} - ${c.nome}`));
-  const clienteId = parseInt(readline.question("ID do cliente: "));
+  const clienteId = parseInt(readline.question("\nID do cliente: "));
   const cliente = clientes.find(c => c.id === clienteId);
   if (!cliente) { console.log("Cliente não encontrado."); return; }
 
@@ -166,20 +166,20 @@ function criarPedido() {
   let adicionarMais = "s";
 
   while (adicionarMais === "s") {
-    console.log("Escolha o produto:");
+    console.log("\nEscolha o produto:");
     produtos.forEach(p => console.log(`${p.id} - ${p.nome} (${p.valor.toFixed(2)})`));
-    const produtoId = parseInt(readline.question("ID do produto: "));
+    const produtoId = parseInt(readline.question("\nID do produto: "));
     const produto = produtos.find(p => p.id === produtoId);
     if (produto) {
       produtosEscolhidos.push(produto);
-      console.log(`Produto ${produto.nome} adicionado!`);
+      console.log(`\nProduto ${produto.nome} adicionado!`);
     } else {
-      console.log("Produto não encontrado.");
+      console.log("\nProduto não encontrado.");
     }
 
-    adicionarMais = readline.question("Deseja adicionar outro produto? (s/n): ").toLowerCase();
+    adicionarMais = readline.question("\nDeseja adicionar outro produto? (s/n): ").toLowerCase();
     while (adicionarMais !== "s" && adicionarMais !== "n") {
-      adicionarMais = readline.question("Digite 's' ou 'n': ").toLowerCase();
+      adicionarMais = readline.question("\nDigite 's' ou 'n': ").toLowerCase();
     }
   }
 
@@ -191,7 +191,7 @@ function criarPedido() {
   console.log("2 - Cartão");
   console.log("3 - Pix");
 
-  let opcaoPagamento = readline.question("Opcao: ");
+  let opcaoPagamento = readline.question("\nOpcao: ");
   while (!["1", "2", "3"].includes(opcaoPagamento)) {
     opcaoPagamento = readline.question("Opção inválida. Escolha 1, 2 ou 3: ");
   }
@@ -224,7 +224,7 @@ do {
   console.log("6 - Histórico de Vendas");
   console.log("7 - Sair");
 
-  const escolha = readline.question("Escolha uma opcao: ");
+  const escolha = readline.question("\nEscolha uma opcao: ");
 
   if (escolha === "1") menuClientes();
   else if (escolha === "2") menuProdutos();
@@ -232,10 +232,10 @@ do {
   else if (escolha === "4") criarRelatorioDiario();
   else if (escolha === "5") criarRelatorioMensal();
   else if (escolha === "6") {
-    console.log("======== Histórico de Vendas ========");
+    console.log("======== Histórico de Vendas ========\n");
     console.log(HistoricoVendas.listar());}
   else if (escolha === "7") { console.log("Saindo do sistema..."); break; }
   else console.log("Opcao invalida!");
 
-  continuar = readline.question("Deseja realizar outra operacao? (s/n): ").toLowerCase();
+  continuar = readline.question("\nDeseja realizar outra operacao? (s/n): ").toLowerCase();
 } while (continuar === "s");
