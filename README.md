@@ -24,8 +24,9 @@ Ao executar o sistema, você terá acesso a um **menu interativo** via terminal 
    - O sistema calcula automaticamente o valor total.  
    - É exibido um **recibo formatado** com informações do cliente, data, produtos e valor final.  
 4. **Relatório Diário** → mostra a quantidade de pedidos e faturamento do dia.  
-5. **Relatório Mensal** → mostra a quantidade de pedidos e faturamento do mês.  
-6. **Sair** → encerra o sistema.  
+5. **Relatório Mensal** → mostra a quantidade de pedidos e faturamento do mês.
+6. **Histórico de Vendas** → mostra todos os pedidos feitos.
+7. **Sair** → encerra o sistema.  
 
 ---
 
@@ -111,7 +112,8 @@ node dist/index.js
 3 - Criar Pedido
 4 - Ver relatório diário
 5 - Ver relatório mensal
-6 - Sair
+6 - Histórico de Vendas
+7 - Sair
 ```
 
 👉 Cadastra cliente → adiciona produto (pizza, sobremesa ou bebida) → cria pedido → gera recibo → consulta relatórios.  
