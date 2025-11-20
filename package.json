@@ -22,11 +22,14 @@
   "homepage": "https://github.com/Hugo-Nascimento748/Sistema-Pizzaria#readme",
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/pg": "^8.15.6",
     "@types/readline-sync": "^1.4.8",
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "pg": "^8.16.3",
     "readline-sync": "^1.4.10"
   }
 }

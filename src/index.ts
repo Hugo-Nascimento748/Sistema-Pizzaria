@@ -1,33 +1,42 @@
+// src/index.ts
 import * as readline from "readline-sync";
+
 import { ClienteService } from "./services/ClienteService";
 import { ProdutoService } from "./services/ProdutoService";
 import { PedidoService } from "./services/PedidoService";
+
 import { Recibo } from "./reports/Recibo";
 import { VendasDiarias } from "./reports/VendasDiarias";
 import { VendasMensais } from "./reports/VendasMensais";
 import { HistoricoVendas } from "./reports/HistoricoVendas";
 
+// ------------------ INSTÂNCIAS ------------------
 const clienteService = new ClienteService();
 const produtoService = new ProdutoService();
 const pedidoService = new PedidoService();
 
 // ------------------ DADOS DE TESTE ------------------
-clienteService.adicionarCliente({ id: 0, nome: "Ana Silva", endereco: "Rua A, 123", telefone: "99999-1111" });
-clienteService.adicionarCliente({ id: 0, nome: "Carlos Souza", endereco: "Rua B, 456", telefone: "88888-2222" });
+async function inicializarDadosTeste() {
+  // Caso queira iniciar com dados padrão, descomente abaixo:
 
-produtoService.adicionarProduto({ id: 0, nome: "Pizza Calabresa", valor: 35.0, tipo: "Pizza" });
-produtoService.adicionarProduto({ id: 0, nome: "Pizza Mussarela", valor: 30.0, tipo: "Pizza" });
+  /*
+  await clienteService.adicionarCliente({ id: 0, nome: "Ana Silva", endereco: "Rua A, 123", telefone: "99999-1111" });
+  await clienteService.adicionarCliente({ id: 0, nome: "Carlos Souza", endereco: "Rua B, 456", telefone: "88888-2222" });
 
-produtoService.adicionarProduto({ id: 0, nome: "Refrigerante Coca-Cola", valor: 8.0, tipo: "Bebida" });
-produtoService.adicionarProduto({ id: 0, nome: "Suco Natural", valor: 6.0, tipo: "Bebida" });
+  await produtoService.adicionarProduto({ id: 0, nome: "Pizza Calabresa", valor: 35.0, tipo: "Pizza" });
+  await produtoService.adicionarProduto({ id: 0, nome: "Pizza Mussarela", valor: 30.0, tipo: "Pizza" });
 
-produtoService.adicionarProduto({ id: 0, nome: "Pudim", valor: 12.0, tipo: "Sobremesa" });
-produtoService.adicionarProduto({ id: 0, nome: "Brigadeiro", valor: 5.0, tipo: "Sobremesa" });
+  await produtoService.adicionarProduto({ id: 0, nome: "Coca-Cola", valor: 8.0, tipo: "Bebida" });
+  await produtoService.adicionarProduto({ id: 0, nome: "Suco Natural", valor: 6.0, tipo: "Bebida" });
 
+  await produtoService.adicionarProduto({ id: 0, nome: "Pudim", valor: 12.0, tipo: "Sobremesa" });
+  await produtoService.adicionarProduto({ id: 0, nome: "Brigadeiro", valor: 5.0, tipo: "Sobremesa" });
+  */
+}
 
 // ------------------ MENU CLIENTES ------------------
-function menuClientes() {
-  let continuarClientes: string;
+async function menuClientes() {
+  let continuar: string;
   do {
     console.log("\n---- MENU CLIENTES ----");
     console.log("1 - Adicionar Cliente");
@@ -38,53 +47,83 @@ function menuClientes() {
 
     const opcao = readline.question("Escolha uma opcao: ");
 
-    if (opcao === "1") {
-      const nome = readline.question("Nome: ");
-      const endereco = readline.question("Endereco: ");
-      const telefone = readline.question("Telefone: ");
-      clienteService.adicionarCliente({ id: 0, nome, endereco, telefone });
+    switch (opcao) {
+      case "1": {
+        const nome = readline.question("Nome: ");
+        const endereco = readline.question("Endereco: ");
+        const telefone = readline.question("Telefone: ");
 
-    } else if (opcao === "2") {
-      const clientes = clienteService.listarClientes();
-      if (clientes.length === 0) { console.log("Nenhum cliente cadastrado."); return; }
-      clientes.forEach(c => console.log(`ID: ${c.id} | Nome: ${c.nome} | Endereco: ${c.endereco} | Telefone: ${c.telefone}`));
-      const id = parseInt(readline.question("ID do cliente a editar: "));
-      const clienteExistente = clientes.find(c => c.id === id);
-      if (!clienteExistente) { console.log("Cliente nao encontrado!"); return; }
-      console.log("\nEditando cliente (deixe em branco para manter o valor atual)");
-      const nome = readline.question(`Nome (${clienteExistente.nome}): `);
-      const endereco = readline.question(`Endereco (${clienteExistente.endereco}): `);
-      const telefone = readline.question(`Telefone (${clienteExistente.telefone}): `);
-      const dadosAtualizados: any = {};
-      if (nome) dadosAtualizados.nome = nome;
-      if (endereco) dadosAtualizados.endereco = endereco;
-      if (telefone) dadosAtualizados.telefone = telefone;
-      clienteService.editarCliente(id, dadosAtualizados);
+        await clienteService.adicionarCliente({ id: 0, nome, endereco, telefone });
+        break;
+      }
 
-    } else if (opcao === "3") {
-      const clientes = clienteService.listarClientes();
-      if (clientes.length === 0) { console.log("Nenhum cliente cadastrado."); return; }
-      clientes.forEach(c => console.log(`ID: ${c.id} | Nome: ${c.nome}`));
-      const id = parseInt(readline.question("ID do cliente a remover: "));
-      clienteService.removerCliente(id);
-      console.log(`Cliente ${id} removido com sucesso!`);
+      case "2": {
+        const clientes = await clienteService.listarClientes();
+        if (!clientes.length) return console.log("Nenhum cliente cadastrado.");
 
-    } else if (opcao === "4") {
-      const clientes = clienteService.listarClientes();
-      console.log("\n-- LISTA DE CLIENTES --");
-      if (clientes.length === 0) console.log("Nenhum cliente cadastrado.");
-      else clientes.forEach(c => console.log(`ID: ${c.id} | Nome: ${c.nome} | Endereco: ${c.endereco} | Telefone: ${c.telefone}`));
+        clientes.forEach(c =>
+          console.log(`ID: ${c.id} | Nome: ${c.nome} | Endereco: ${c.endereco} | Telefone: ${c.telefone}`)
+        );
 
-    } else if (opcao === "5") break;
-    else console.log("Opcao invalida!");
+        const id = Number(readline.question("ID do cliente a editar: "));
+        const clienteExistente = clientes.find(c => c.id === id);
 
-    continuarClientes = readline.question("Deseja realizar outra operacao de cliente? (s/n): ").toLowerCase();
-  } while (continuarClientes === "s");
+        if (!clienteExistente) return console.log("Cliente nao encontrado!");
+
+        console.log("\nEditando cliente (enter = manter atual):");
+
+        const nome = readline.question(`Nome (${clienteExistente.nome}): `);
+        const endereco = readline.question(`Endereco (${clienteExistente.endereco}): `);
+        const telefone = readline.question(`Telefone (${clienteExistente.telefone}): `);
+
+        const dadosAtualizados: any = {
+          ...(nome && { nome }),
+          ...(endereco && { endereco }),
+          ...(telefone && { telefone }),
+        };
+
+        await clienteService.editarCliente(id, dadosAtualizados);
+        break;
+      }
+
+      case "3": {
+        const clientes = await clienteService.listarClientes();
+        if (!clientes.length) return console.log("Nenhum cliente cadastrado.");
+
+        clientes.forEach(c => console.log(`ID: ${c.id} | Nome: ${c.nome}`));
+
+        const id = Number(readline.question("ID do cliente a remover: "));
+        await clienteService.removerCliente(id);
+
+        console.log(`Cliente ${id} removido com sucesso!`);
+        break;
+      }
+
+      case "4": {
+        const clientes = await clienteService.listarClientes();
+        console.log("\n-- LISTA DE CLIENTES --");
+
+        if (!clientes.length) console.log("Nenhum cliente cadastrado.");
+        else clientes.forEach(c =>
+          console.log(`ID: ${c.id} | Nome: ${c.nome} | Endereco: ${c.endereco} | Telefone: ${c.telefone}`)
+        );
+        break;
+      }
+
+      case "5":
+        return;
+
+      default:
+        console.log("Opcao invalida!");
+    }
+
+    continuar = readline.question("Deseja realizar outra operacao de cliente? (s/n): ").toLowerCase();
+  } while (continuar === "s");
 }
 
 // ------------------ MENU PRODUTOS ------------------
-function menuProdutos() {
-  let continuarProdutos: string;
+async function menuProdutos() {
+  let continuar: string;
   do {
     console.log("\n---- MENU PRODUTOS ----");
     console.log("1 - Adicionar Produto");
@@ -95,97 +134,133 @@ function menuProdutos() {
 
     const opcao = readline.question("Escolha uma opcao: ");
 
-    if (opcao === "1") {
-      const nome = readline.question("Nome do produto: ");
-      const valor = parseFloat(readline.question("Valor: "));
-      const tipo = readline.question("Tipo do produto (ex: Pizza, Bebida, Sobremesa): ");
-      produtoService.adicionarProduto({ id: 0, nome, valor, tipo });
+    switch (opcao) {
+      case "1": {
+        const nome = readline.question("Nome do produto: ");
+        const valor = Number(readline.question("Valor: "));
+        const tipo = readline.question("Tipo (Pizza, Bebida, Sobremesa): ");
 
-    } else if (opcao === "2") {
-      const produtos = produtoService.listarProduto();
-      if (produtos.length === 0) { console.log("Nenhum produto cadastrado."); return; }
-      produtos.forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome} | Valor: ${p.valor.toFixed(2)} | Tipo: ${p.tipo}`));
-      const id = parseInt(readline.question("ID do produto a editar: "));
-      const produtoExistente = produtos.find(p => p.id === id);
-      if (!produtoExistente) { console.log("Produto nao encontrado!"); return; }
-      console.log("\nEditando produto (deixe em branco para manter o valor atual)");
-      const nome = readline.question(`Nome (${produtoExistente.nome}): `);
-      const valorString = readline.question(`Valor (${produtoExistente.valor.toFixed(2)}): `);
-      const valor = valorString ? parseFloat(valorString) : undefined;
-      const tipo = readline.question(`Tipo (${produtoExistente.tipo}): `);
-      const dadosAtualizados: any = {};
-      if (nome) dadosAtualizados.nome = nome;
-      if (valor !== undefined) dadosAtualizados.valor = valor;
-      if (tipo) dadosAtualizados.tipo = tipo;
-      produtoService.editarProduto(id, dadosAtualizados);
-
-    } else if (opcao === "3") {
-      const produtos = produtoService.listarProduto();
-      if (produtos.length === 0) { console.log("Nenhum produto cadastrado."); return; }
-      produtos.forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome}`));
-      const id = parseInt(readline.question("ID do produto a remover: "));
-      produtoService.removerProduto(id);
-      console.log(`Produto ${id} removido com sucesso!`);
-
-    } else if (opcao === "4") {
-      const produtos = produtoService.listarProduto();
-      console.log("\n-- LISTA DE PRODUTOS --");
-      if (produtos.length === 0) console.log("Nenhum produto cadastrado.");
-      else {
-        const tipos = Array.from(new Set(produtos.map(p => p.tipo)));
-        tipos.forEach(tipo => {
-          console.log(`\n-- ${tipo.toUpperCase()} --`);
-          produtos.filter(p => p.tipo === tipo)
-                  .forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome} | Valor: ${p.valor.toFixed(2)}`));
-        });
+        await produtoService.adicionarProduto({ id: 0, nome, valor, tipo });
+        break;
       }
 
-    } else if (opcao === "5") break;
-    else console.log("Opcao invalida!");
+      case "2": {
+        const produtos = await produtoService.listarProdutos();
+        if (!produtos.length) return console.log("Nenhum produto cadastrado.");
 
-    continuarProdutos = readline.question("Deseja realizar outra operacao de produto? (s/n): ").toLowerCase();
-  } while (continuarProdutos === "s");
+        produtos.forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome} | Valor: ${p.valor.toFixed(2)} | Tipo: ${p.tipo}`));
+
+        const id = Number(readline.question("ID do produto a editar: "));
+        const produtoExistente = produtos.find(p => p.id === id);
+
+        if (!produtoExistente) return console.log("Produto nao encontrado!");
+
+        console.log("\nEditando produto (enter = manter atual):");
+
+        const nome = readline.question(`Nome (${produtoExistente.nome}): `);
+        const valorInput = readline.question(`Valor (${produtoExistente.valor.toFixed(2)}): `);
+        const tipo = readline.question(`Tipo (${produtoExistente.tipo}): `);
+
+        const dadosAtualizados: any = {
+          ...(nome && { nome }),
+          ...(valorInput && { valor: Number(valorInput) }),
+          ...(tipo && { tipo }),
+        };
+
+        await produtoService.editarProduto(id, dadosAtualizados);
+        break;
+      }
+
+      case "3": {
+        const produtos = await produtoService.listarProdutos();
+        if (!produtos.length) return console.log("Nenhum produto cadastrado.");
+
+        produtos.forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome}`));
+
+        const id = Number(readline.question("ID do produto a remover: "));
+        await produtoService.removerProduto(id);
+
+        console.log(`Produto ${id} removido com sucesso!`);
+        break;
+      }
+
+      case "4": {
+        const produtos = await produtoService.listarProdutos();
+
+        console.log("\n-- LISTA DE PRODUTOS --");
+        if (!produtos.length) return console.log("Nenhum produto cadastrado.");
+
+        const tipos = Array.from(new Set(produtos.map(p => p.tipo)));
+
+        tipos.forEach(tipo => {
+          console.log(`\n-- ${tipo.toUpperCase()} --`);
+          produtos
+            .filter(p => p.tipo === tipo)
+            .forEach(p => console.log(`ID: ${p.id} | Nome: ${p.nome} | Valor: ${p.valor.toFixed(2)}`));
+        });
+
+        break;
+      }
+
+      case "5":
+        return;
+
+      default:
+        console.log("Opcao invalida!");
+    }
+
+    continuar = readline.question("Deseja realizar outra operacao de produto? (s/n): ").toLowerCase();
+  } while (continuar === "s");
 }
 
 // ------------------ CRIAR PEDIDO ------------------
-function criarPedido() {
-  const clientes = clienteService.listarClientes();
-  const produtos = produtoService.listarProduto();
-  if (clientes.length === 0 || produtos.length === 0) {
-    console.log("É necessário ter clientes e produtos cadastrados primeiro.");
-    return;
-  }
+async function criarPedido() {
+  const clientes = await clienteService.listarClientes();
+  const produtos = await produtoService.listarProdutos();
 
+  if (!clientes.length || !produtos.length)
+    return console.log("É necessário ter clientes e produtos cadastrados primeiro.");
+
+  // Seleção do cliente
   console.log("\nEscolha o cliente:");
   clientes.forEach(c => console.log(`${c.id} - ${c.nome}`));
-  const clienteId = parseInt(readline.question("\nID do cliente: "));
-  const cliente = clientes.find(c => c.id === clienteId);
-  if (!cliente) { console.log("Cliente não encontrado."); return; }
 
-  const produtosEscolhidos: typeof produtos = [];
+  const clienteId = Number(readline.question("\nID do cliente: "));
+  const cliente = clientes.find(c => c.id === clienteId);
+
+  if (!cliente) return console.log("Cliente não encontrado.");
+
+  // Seleção de produtos
+  const produtosEscolhidos: any[] = [];
   let adicionarMais = "s";
 
   while (adicionarMais === "s") {
     console.log("\nEscolha o produto:");
     produtos.forEach(p => console.log(`${p.id} - ${p.nome} (${p.valor.toFixed(2)})`));
-    const produtoId = parseInt(readline.question("\nID do produto: "));
+
+    const produtoId = Number(readline.question("\nID do produto: "));
     const produto = produtos.find(p => p.id === produtoId);
-    if (produto) {
-      produtosEscolhidos.push(produto);
-      console.log(`\nProduto ${produto.nome} adicionado!`);
-    } else {
+
+    if (!produto) {
       console.log("\nProduto não encontrado.");
+    } else {
+      const quantidade = Number(readline.question("Quantidade: "));
+      produtosEscolhidos.push({ id: produto.id, quantidade });
+      console.log(`\nProduto ${produto.nome} adicionado!`);
     }
 
     adicionarMais = readline.question("\nDeseja adicionar outro produto? (s/n): ").toLowerCase();
-    while (adicionarMais !== "s" && adicionarMais !== "n") {
-      adicionarMais = readline.question("\nDigite 's' ou 'n': ").toLowerCase();
-    }
   }
 
-  const pedido = pedidoService.adicionarPedido(cliente, produtosEscolhidos, new Date());
+  // Criação do pedido
+  const pedido = await pedidoService.criarPedido(clienteId, produtosEscolhidos);
 
-  // --- Escolha da forma de pagamento ---
+  if (!pedido) {
+      console.log("Erro ao criar o pedido.");
+      return;
+  }
+
+  // Forma de pagamento
   console.log("\nEscolha a forma de pagamento:");
   console.log("1 - Dinheiro");
   console.log("2 - Cartão");
@@ -196,46 +271,73 @@ function criarPedido() {
     opcaoPagamento = readline.question("Opção inválida. Escolha 1, 2 ou 3: ");
   }
 
-  let formaPagamento = "";
-  if (opcaoPagamento === "1") formaPagamento = "Dinheiro";
-  else if (opcaoPagamento === "2") formaPagamento = "Cartão";
-  else if (opcaoPagamento === "3") formaPagamento = "Pix";
+  const formaPagamento = {
+    "1": "Dinheiro",
+    "2": "Cartão",
+    "3": "Pix",
+  }[opcaoPagamento];
 
   console.log(`Pagamento selecionado: ${formaPagamento}`);
 
-  Recibo.gerar(pedido, formaPagamento);
+  Recibo.gerar(pedido, formaPagamento!);
 
-  console.log("Pedido finalizado com sucesso!");
+  console.log("\nPedido finalizado com sucesso!");
 }
 
 // ------------------ RELATÓRIOS ------------------
-function criarRelatorioDiario() { VendasDiarias.gerar(pedidoService.listarPedidos()); }
-function criarRelatorioMensal() { VendasMensais.gerar(pedidoService.listarPedidos()); }
+async function criarRelatorioDiario() {
+  const pedidos = await pedidoService.listarPedidos();
+  VendasDiarias.gerar(pedidos);
+}
+
+async function criarRelatorioMensal() {
+  const pedidos = await pedidoService.listarPedidos();
+  VendasMensais.gerar(pedidos);
+}
 
 // ------------------ MENU PRINCIPAL ------------------
-let continuar: string;
-do {
-  console.log("\n-------- MENU PRINCIPAL --------");
-  console.log("1 - Clientes");
-  console.log("2 - Produtos");
-  console.log("3 - Criar Pedido");
-  console.log("4 - Relatorio Diario");
-  console.log("5 - Relatorio Mensal");
-  console.log("6 - Histórico de Vendas");
-  console.log("7 - Sair");
+async function main() {
+  await inicializarDadosTeste();
 
-  const escolha = readline.question("\nEscolha uma opcao: ");
+  let continuar: string;
+  do {
+    console.log("\n-------- MENU PRINCIPAL --------");
+    console.log("1 - Clientes");
+    console.log("2 - Produtos");
+    console.log("3 - Criar Pedido");
+    console.log("4 - Relatorio Diario");
+    console.log("5 - Relatorio Mensal");
+    console.log("6 - Histórico de Vendas");
+    console.log("7 - Sair");
 
-  if (escolha === "1") menuClientes();
-  else if (escolha === "2") menuProdutos();
-  else if (escolha === "3") criarPedido();
-  else if (escolha === "4") criarRelatorioDiario();
-  else if (escolha === "5") criarRelatorioMensal();
-  else if (escolha === "6") {
-    console.log("======== Histórico de Vendas ========\n");
-    console.log(HistoricoVendas.listar());}
-  else if (escolha === "7") { console.log("Saindo do sistema..."); break; }
-  else console.log("Opcao invalida!");
+    const escolha = readline.question("\nEscolha uma opcao: ");
 
-  continuar = readline.question("\nDeseja realizar outra operacao? (s/n): ").toLowerCase();
-} while (continuar === "s");
+    switch (escolha) {
+      case "1": await menuClientes(); break;
+      case "2": await menuProdutos(); break;
+      case "3": await criarPedido(); break;
+      case "4": await criarRelatorioDiario(); break;
+      case "5": await criarRelatorioMensal(); break;
+
+      case "6":
+        console.log("\n======== Histórico de Vendas ========\n");
+        console.log(await HistoricoVendas.listarFormatado());
+        break;
+
+      case "7":
+        console.log("Saindo do sistema...");
+        return;
+
+      default:
+        console.log("Opcao invalida!");
+    }
+
+    continuar = readline.question("\nDeseja realizar outra operacao? (s/n): ").toLowerCase();
+  } while (continuar === "s");
+}
+
+// ------------------ EXECUÇÃO ------------------
+main().catch(err => {
+  console.error("Erro inesperado:", err);
+  process.exit(1);
+});

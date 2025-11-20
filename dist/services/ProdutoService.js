@@ -1,33 +1,40 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutoService = void 0;
+const ProdutoRepository_1 = require("../repositories/ProdutoRepository");
 class ProdutoService {
-    constructor() {
-        this.produtos = [];
-        this.contadorId = 1;
-    }
     adicionarProduto(produto) {
-        produto.id = this.contadorId;
-        this.contadorId++;
-        this.produtos.push(produto);
-        console.log(`Produto ${produto.nome} (${produto.tipo}) adicionado com sucesso!`);
+        return __awaiter(this, void 0, void 0, function* () {
+            const novo = yield ProdutoRepository_1.ProdutoRepository.criar(produto);
+            console.log(`Produto ${novo.nome} adicionado ao banco!`);
+            return novo;
+        });
     }
-    editarProduto(id, dadosAtualizados) {
-        const produto = this.produtos.find(p => p.id === id);
-        if (produto) {
-            Object.assign(produto, dadosAtualizados);
-            console.log(`Produto com id ${id} atualizado com sucesso!`);
-        }
-        else {
-            console.log(`Produto não encontrado!`);
-        }
-    }
-    listarProduto() {
-        return this.produtos;
+    listarProdutos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield ProdutoRepository_1.ProdutoRepository.listar();
+        });
     }
     removerProduto(id) {
-        this.produtos = this.produtos.filter(p => p.id !== id);
-        console.log(`Produto ${id} removido com sucesso!`);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ProdutoRepository_1.ProdutoRepository.remover(id);
+            console.log(`Produto ${id} removido.`);
+        });
+    }
+    editarProduto(id, dados) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ProdutoRepository_1.ProdutoRepository.atualizar(id, dados);
+            console.log(`Produto ${id} atualizado.`);
+        });
     }
 }
 exports.ProdutoService = ProdutoService;

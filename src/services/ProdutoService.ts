@@ -1,34 +1,26 @@
+// src/services/ProdutoService.ts
 import { Produto } from "../models/Produto";
+import { ProdutoRepository } from "../repositories/ProdutoRepository";
 
 export class ProdutoService {
-    private produtos: Produto[] = [];
-    private contadorId: number = 1;
 
-    adicionarProduto(produto: Produto) {
-    produto.id = this.contadorId;
-    this.contadorId++;
-    this.produtos.push(produto);
-    console.log(`Produto ${produto.nome} (${produto.tipo}) adicionado com sucesso!`);
-}
-
-editarProduto(id: number, dadosAtualizados: Partial<Produto>){
-    const produto = this.produtos.find(p => p.id === id)
-    if (produto){
-        Object.assign(produto, dadosAtualizados);
-        console.log(`Produto com id ${id} atualizado com sucesso!`);
+    async adicionarProduto(produto: Produto) {
+        const novo = await ProdutoRepository.criar(produto);
+        console.log(`Produto ${novo.nome} adicionado ao banco!`);
+        return novo;
     }
-    else {
-        console.log(`Produto não encontrado!`);
+
+    async listarProdutos() {
+        return await ProdutoRepository.listar();
     }
-}
 
-listarProduto(): Produto[] {
-    return this.produtos;
-}
+    async removerProduto(id: number) {
+        await ProdutoRepository.remover(id);
+        console.log(`Produto ${id} removido.`);
+    }
 
-removerProduto(id: number) {
-    this.produtos = this.produtos.filter(p => p.id !== id);
-    console.log(`Produto ${id} removido com sucesso!`);
-}
-
+    async editarProduto(id: number, dados: Partial<Produto>) {
+        await ProdutoRepository.atualizar(id, dados);
+        console.log(`Produto ${id} atualizado.`);
+    }
 }

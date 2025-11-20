@@ -9,5 +9,5 @@ function formatarMoeda(valor) {
     });
 }
 function formatarData(data) {
-    return data.toLocaleDateString("pt-BR");
+    return new Date(data).toLocaleDateString("pt-BR");
 }

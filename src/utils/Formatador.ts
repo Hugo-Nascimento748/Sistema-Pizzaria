@@ -5,6 +5,6 @@ export function formatarMoeda(valor: number): string {
     });
 }
 
-export function formatarData(data: Date): string{
-    return data.toLocaleDateString("pt-BR");
+export function formatarData(data: Date | string): string {
+    return new Date(data).toLocaleDateString("pt-BR");
 }

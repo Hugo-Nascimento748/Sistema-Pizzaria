@@ -1,54 +1,30 @@
-import { Pedido } from "../models/Pedido";
-import { Produto } from "../models/Produto";
-import { Cliente } from "../models/Cliente";
-import { HistoricoVendas } from "../reports/HistoricoVendas";
+// src/services/PedidoService.ts
+import { PedidoRepository } from "../repositories/PedidoRepository";
 
 export class PedidoService {
-    private pedidos: Pedido[] = [];
-    private contadorId: number = 1;
 
-    adicionarPedido(cliente: Cliente, produtos: Produto[], data: Date) {
-        let valorTotal = 0;
-        for (const produto of produtos) {
-            valorTotal += produto.valor;
+    async criarPedido(clienteId: number, produtos: { id: number; quantidade: number }[]) {
+        const pedidoId = await PedidoRepository.criar(clienteId, produtos);
+
+        // Busca o pedido completo já formatado
+        const pedido = await PedidoRepository.detalhar(pedidoId);
+
+        if (!pedido) {
+            throw new Error("Erro interno: pedido criado mas não encontrado.");
         }
-
-        console.log(`Valor Total: $${valorTotal}`);
-
-        const pedido: Pedido = {
-            id: this.contadorId,
-            cliente: cliente,
-            data: new Date(),
-            valorTotal: valorTotal,
-            produtos: produtos
-        };
-
-        this.contadorId++;
-        this.pedidos.push(pedido);
-
-        console.log(`O produto do cliente ${cliente.nome} foi adicionado. Valor Total: $${valorTotal}`);
-
-        // 🔥 REGISTRA NO HISTÓRICO DE VENDAS
-        HistoricoVendas.registrar(pedido);
 
         return pedido;
     }
 
-    listarPedidos(): Pedido[] {
-        return this.pedidos;
+    async listarPedidos() {
+        return await PedidoRepository.listar();
     }
 
-    removerPedido(id: number) {
-        this.pedidos = this.pedidos.filter(p => p.id !== id);
+    async removerPedido(id: number) {
+        await PedidoRepository.remover(id);
     }
 
-    editarPedido(id: number, dadosAtualizados: Partial<Pedido>) {
-        const pedido = this.pedidos.find(p => p.id === id);
-        if (pedido) {
-            Object.assign(pedido, dadosAtualizados);
-            console.log(`Dados atualizados.`);
-        } else {
-            console.log(`Pedido não encontrado!`);
-        }
+    async detalharPedido(id: number) {
+        return await PedidoRepository.detalhar(id);
     }
 }

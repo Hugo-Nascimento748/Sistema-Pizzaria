@@ -1,41 +1,21 @@
-import * as fs from "fs";
-import { Pedido } from "../models/Pedido";
+// src/reports/HistoricoVendas.ts
+import { HistoricoVendasRepository } from "../repositories/HistoricoVendasRepository";
 import { formatarData, formatarMoeda } from "../utils/Formatador";
 
 export class HistoricoVendas {
-    private static caminho = "historico_vendas.csv";
 
-    static registrar(pedido: Pedido) {
-        const existe = fs.existsSync(this.caminho);
+    static async listarFormatado(): Promise<string> {
+        const pedidos = await HistoricoVendasRepository.listar();
 
-        // Criar cabeçalho se o arquivo ainda não existir
-        if (!existe) {
-            fs.writeFileSync(
-                this.caminho,
-                "Data,Cliente,Produtos,Valor Total\n",
-                { encoding: "utf-8" }
-            );
-        }
+        if (pedidos.length === 0) return "Nenhuma venda registrada.";
 
-        // ✅ Ajustado para seu modelo de Pedido
-        const data = formatarData(new Date(pedido.data));
-        const cliente = pedido.cliente.nome;
-        const produtos = pedido.produtos
-            .map((produto: any) => produto.nome)
-            .join(" | ");
-        const valorTotal = formatarMoeda(pedido.valorTotal);
+        return pedidos.map(p => {
+            const produtos = p.produtos.map(pr => `${pr.nome} (x${pr.quantidade})`).join(" | ");
 
-        fs.appendFileSync(
-            this.caminho,
-            `${data},${cliente},"${produtos}",${valorTotal}\n`,
-            { encoding: "utf-8" }
-        );
-    }
-
-    static listar(): string {
-        if (!fs.existsSync(this.caminho)) {
-            return "Nenhum histórico de vendas encontrado.";
-        }
-        return fs.readFileSync(this.caminho, { encoding: "utf-8" });
+            return `${formatarData(p.data)}  
+Cliente: ${p.cliente.nome}  
+Produtos: ${produtos}  
+Total: ${formatarMoeda(p.valorTotal)}\n-----------------------------`;
+        }).join("\n");
     }
 }
