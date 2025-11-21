@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzaria - Pedido Online</title>
+    <link rel="stylesheet" href="cliente.css">
+</head>
+<body>
+
+    <!-- CABEÇALHO (Só aparece logado) -->
+    <header id="header-app" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1 style="margin:0; font-size:1.2em;">🍕 Pizzaria Dev</h1>
+                <small id="nome-cliente" style="color:#aaa;">Olá, Cliente</small>
+            </div>
+            <button id="btn-sair" class="btn-danger">Sair</button>
+        </div>
+    </header>
+
+    <!-- ---------------- TELA LOGIN / CADASTRO ---------------- -->
+    <section id="login-cadastro" class="container-central">
+        <div class="card-login">
+            <h1 style="color:#007acc;">Bem-vindo</h1>
+            
+            <!-- Abas para alternar -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarAba('login')">Já tenho conta</button>
+                <button class="tab-btn" onclick="mudarAba('cadastro')">Criar conta</button>
+            </div>
+
+            <!-- FORM LOGIN -->
+            <form id="form-login" class="form-content">
+                <input type="text" id="telefone-login" placeholder="Seu Telefone" autocomplete="tel" required>
+                <button type="submit" class="btn-full">Entrar</button>
+            </form>
+
+            <!-- FORM CADASTRO -->
+            <div id="form-cadastro" class="form-content" style="display:none;">
+                <input type="text" id="nome" placeholder="Seu Nome" autocomplete="name">
+                <input type="text" id="endereco" placeholder="Seu Endereço" autocomplete="street-address">
+                <input type="text" id="telefone-cad" placeholder="Seu Telefone" autocomplete="tel">
+                <button id="btn-cadastrar" class="btn-full btn-success">Cadastrar e Entrar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---------------- TELA PRODUTOS ---------------- -->
+    <section id="area-produtos" style="display:none; padding-bottom: 80px;">
+        
+        <!-- Filtros -->
+        <div id="filtros">
+            <button class="filtro active" data-categoria="Todas">Todos</button>
+            <button class="filtro" data-categoria="Pizza">Pizzas</button>
+            <button class="filtro" data-categoria="Bebida">Bebidas</button>
+            <button class="filtro" data-categoria="Sobremesa">Sobremesas</button>
+        </div>
+
+        <div id="lista-produtos"></div>
+    </section>
+
+    <!-- ---------------- BARRA FLUTUANTE (CARRINHO) ---------------- -->
+    <div id="barra-carrinho" onclick="abrirModalCarrinho()">
+        <div>
+            <span id="qtd-carrinho" style="background:white; color:black; padding:2px 6px; border-radius:50%; font-size:0.8em; font-weight:bold;">0</span>
+            Ver Carrinho
+        </div>
+        <div id="total-barra" style="font-weight:bold;">R$ 0,00</div>
+    </div>
+
+    <!-- ---------------- MODAL CARRINHO ---------------- -->
+    <div id="modal-carrinho" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModalCarrinho()">&times;</span>
+            <h2>Seu Pedido</h2>
+            <ul id="itens-carrinho"></ul>
+            
+            <div class="resumo-pedido">
+                <h3>Total: R$ <span id="total-modal">0.00</span></h3>
+            </div>
+
+            <button id="btn-finalizar" class="btn-full btn-success">✅ Enviar Pedido</button>
+        </div>
+    </div>
+
+    <script src="cliente.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Pizzaria - Admin</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #121212; color: #e0e0e0; padding: 20px; margin: 0; }
+        
+        /* MENU */
+        .menu { display: flex; gap: 10px; background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-nav { background: #333; color: white; }
+        .btn-nav.ativo { background: #007acc; }
+
+        /* TELAS */
+        section { display: none; animation: fadeIn 0.3s; }
+        section.ativo { display: block; }
+
+        /* CARDS E LISTAS */
+        ul { list-style: none; padding: 0; }
+        .card-item { background: #1e1e1e; border: 1px solid #333; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* TABELA DE VENDAS */
+        .total-box { background: #27ae60; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 2em; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: #1e1e1e; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
+        
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(3px); }
+        .modal-content { background-color: #252525; margin: 5% auto; padding: 30px; border: 1px solid #444; width: 90%; max-width: 500px; border-radius: 12px; position: relative; }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
+
+        /* FORMULÁRIO DE PRODUTO EM DESTAQUE */
+        .form-container { background: #252525; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #007acc; }
+        .form-editando { border-left: 5px solid #f39c12; } /* Muda cor quando edita */
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">🍕 Painel Admin</h1>
+        <button id="logout" style="background:#c0392b; color:white;">Sair</button>
+    </div>
+
+    <div class="menu">
+        <button class="btn-nav" onclick="mostrarSecao('pedidos')">📦 Pedidos</button>
+        <button class="btn-nav ativo" onclick="mostrarSecao('produtos')">🍔 Produtos</button>
+        <button class="btn-nav" onclick="mostrarSecao('vendas')" style="background:#27ae60;">💰 Histórico</button>
+    </div>
+
+    <!-- TELA PEDIDOS -->
+    <section id="secao-pedidos">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <h2>Pedidos Pendentes</h2>
+            <button onclick="carregarPedidos()" style="background:#444; color:white;">🔄 Atualizar</button>
+        </div>
+        <ul id="lista-pedidos"></ul>
+    </section>
+
+    <!-- TELA PRODUTOS -->
+    <section id="secao-produtos" class="ativo">
+        <h2>Gerenciar Produtos</h2>
+        
+        <div id="box-form" class="form-container">
+            <h3 id="titulo-form" style="margin-top:0;">Novo Produto</h3>
+            <form id="form-produto" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                
+                <!-- CAMPO OCULTO PARA GUARDAR O ID NA EDIÇÃO -->
+                <input type="hidden" id="prod-id"> 
+                
+                <input type="text" id="nome" placeholder="Nome do produto" required style="padding:10px; flex:2; background:#333; border:none; color:white; border-radius:4px;">
+                <input type="number" id="valor" placeholder="Valor R$" required step="0.01" style="padding:10px; width:100px; background:#333; border:none; color:white; border-radius:4px;">
+                
+                <select id="tipo" style="padding:10px; background:#333; border:none; color:white; border-radius:4px;">
+                    <option value="Pizza">Pizza</option>
+                    <option value="Bebida">Bebida</option>
+                    <!-- AQUI ESTÁ A SOBREMESA -->
+                    <option value="Sobremesa">Sobremesa</option> 
+                </select>
+                
+                <button type="submit" id="btn-salvar-prod" style="background:#007acc; color:white;">Salvar</button>
+                <button type="button" onclick="cancelarEdicao()" id="btn-cancelar" style="display:none; background:#555; color:white;">Cancelar</button>
+            </form>
+        </div>
+
+        <ul id="lista-produtos"></ul>
+    </section>
+
+    <!-- TELA VENDAS -->
+    <section id="secao-vendas">
+        <h2>Histórico Financeiro</h2>
+        <div class="total-box">
+            <small style="font-size:0.4em; display:block;">TOTAL FATURADO</small>
+            <span id="vendas-total-geral">R$ 0,00</span>
+        </div>
+        <button onclick="carregarVendas()" style="background:#444; color:white; margin-bottom:10px;">🔄 Atualizar Relatório</button>
+        <table>
+            <thead><tr><th>ID Venda</th><th>Data</th><th style="text-align:right;">Valor</th></tr></thead>
+            <tbody id="tabela-vendas"></tbody>
+        </table>
+    </section>
+
+    <!-- MODAL DETALHES -->
+    <div id="modal-detalhes" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2 style="margin-top:0; color:#007acc;">Pedido <span id="modal-id">#</span></h2>
+            <div id="modal-info-cliente" style="background:#333; padding:15px; border-radius:8px; margin-bottom:15px;"></div>
+            <h3>Itens:</h3>
+            <ul id="modal-lista-itens" style="border-bottom:1px solid #444; padding-bottom:15px;"></ul>
+            <div style="text-align:right; font-size:1.5em; color:#27ae60; font-weight:bold; margin-top:10px;">Total: <span id="modal-total">R$ 0,00</span></div>
+            <br><button onclick="fecharModal()" style="width:100%; background:#444; color:white; padding:12px;">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:3000";
+
+        // --- NAVEGAÇÃO ---
+        function mostrarSecao(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('ativo'));
+            document.getElementById('secao-' + id).classList.add('ativo');
+            document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('ativo'));
+            event.target.classList.add('ativo');
+            if(id === 'pedidos') carregarPedidos();
+            if(id === 'produtos') carregarProdutos();
+            if(id === 'vendas') carregarVendas();
+        }
+
+        // --- AUTH ---
+        if (!localStorage.getItem("auth")) window.location.href = "login.html";
+        document.getElementById("logout").addEventListener("click", () => { localStorage.removeItem("auth"); window.location.href = "login.html"; });
+
+        // ===============================================
+        // LÓGICA DE PRODUTOS (CRIAR, EDITAR, REMOVER)
+        // ===============================================
+        
+        async function carregarProdutos() {
+            try {
+                const res = await fetch(`${API_URL}/produtos`);
+                const produtos = await res.json();
+                const lista = document.getElementById("lista-produtos");
+                lista.innerHTML = "";
+                
+                produtos.forEach(p => {
+                    const li = document.createElement("li");
+                    li.className = "card-item";
+                    
+                    // Botões de Ação (Editar e Excluir)
+                    li.innerHTML = `
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-size:1.1em; font-weight:bold;">${p.nome}</span>
+                            <span style="color:#aaa; font-size:0.9em;">${p.tipo} - R$ ${Number(p.valor).toFixed(2)}</span>
+                        </div>
+                        <div>
+                            <button onclick="prepararEdicao(${p.id}, '${p.nome}', ${p.valor}, '${p.tipo}')" style="background:#f39c12; color:white; padding:8px 12px; margin-right:5px;">✏️ Editar</button>
+                            <button onclick="deletarProduto(${p.id})" style="background:#c0392b; color:white; padding:8px 12px;">🗑️</button>
+                        </div>
+                    `;
+                    lista.appendChild(li);
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // DELETE
+        async function deletarProduto(id) {
+            if(confirm("Tem certeza que deseja excluir este produto?")) {
+                const res = await fetch(`${API_URL}/produtos/${id}`, { method: "DELETE", headers: {usuario:"admin", senha:"1234"} });
+                
+                if(res.ok) {
+                    carregarProdutos(); // Recarrega a lista
+                } else {
+                    // Se o servidor retornar erro (ex: produto em uso), mostramos o alerta
+                    const erro = await res.json();
+                    alert("Não foi possível excluir: " + erro.erro);
+                }
+            }
+        }
+
+        // EDITAR - Passo 1: Jogar os dados no formulário
+        window.prepararEdicao = function(id, nome, valor, tipo) {
+            document.getElementById("prod-id").value = id;
+            document.getElementById("nome").value = nome;
+            document.getElementById("valor").value = valor;
+            document.getElementById("tipo").value = tipo;
+            
+            // Muda visual para o usuário saber que está editando
+            document.getElementById("titulo-form").innerText = "Editando Produto #" + id;
+            const btn = document.getElementById("btn-salvar-prod");
+            btn.innerText = "Atualizar";
+            btn.style.background = "#f39c12";
+            
+            document.getElementById("box-form").classList.add("form-editando");
+            document.getElementById("btn-cancelar").style.display = "inline-block";
+            
+            // Rola a página para o topo para ver o formulário
+            window.scrollTo(0,0);
+        }
+
+        window.cancelarEdicao = function() {
+            document.getElementById("form-produto").reset();
+            document.getElementById("prod-id").value = "";
+            
+            document.getElementById("titulo-form").innerText = "Novo Produto";
+            const btn = document.getElementById("btn-salvar-prod");
+            btn.innerText = "Salvar";
+            btn.style.background = "#007acc";
+            
+            document.getElementById("box-form").classList.remove("form-editando");
+            document.getElementById("btn-cancelar").style.display = "none";
+        }
+
+        // SALVAR (POST ou PUT dependendo se tem ID)
+        document.getElementById("form-produto").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = document.getElementById("prod-id").value;
+            const nome = document.getElementById("nome").value;
+            const valor = document.getElementById("valor").value;
+            const tipo = document.getElementById("tipo").value;
+
+            const dados = { nome, valor: Number(valor), tipo };
+
+            try {
+                if (id) {
+                    // TEM ID? ENTÃO É EDIÇÃO (PUT)
+                    await fetch(`${API_URL}/produtos/${id}`, {
+                        method: "PUT",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(dados)
+                    });
+                    alert("Produto atualizado com sucesso!");
+                } else {
+                    // NÃO TEM ID? ENTÃO É NOVO (POST)
+                    await fetch(`${API_URL}/produtos`, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(dados)
+                    });
+                    alert("Produto criado com sucesso!");
+                }
+                cancelarEdicao();
+                carregarProdutos();
+            } catch (err) {
+                alert("Erro ao salvar produto.");
+            }
+        });
+
+
+        // ===============================================
+        // LÓGICA DE PEDIDOS & VENDAS (Igual ao anterior)
+        // ===============================================
+        async function carregarPedidos() {
+            try {
+                const res = await fetch(`${API_URL}/pedidos`);
+                const pedidos = await res.json();
+                const lista = document.getElementById("lista-pedidos");
+                lista.innerHTML = "";
+                if (pedidos.length === 0) { lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhum pedido pendente.</p>"; return; }
+                
+                pedidos.forEach(p => {
+                    const li = document.createElement("li");
+                    li.className = "card-item";
+                    li.innerHTML = `
+                        <div>
+                            <div style="color:#e74c3c; font-size:1.1em; font-weight:bold;">Pedido #${p.id}</div>
+                            <div>${p.cliente.nome}</div>
+                            <small style="color:#666">${new Date(p.data).toLocaleString()}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:1.2em; color:#27ae60; font-weight:bold; margin-bottom:5px;">R$ ${p.valorTotal.toFixed(2)}</div>
+                            <button onclick="abrirDetalhes(${p.id})" style="background:#007acc; color:white;">Detalhes</button>
+                            <button onclick="concluirPedido(${p.id})" style="background:#27ae60; color:white;">✅ Concluir</button>
+                        </div>
+                    `;
+                    lista.appendChild(li);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function concluirPedido(id) {
+            if(confirm(`Confirmar pagamento do Pedido #${id}?`)) {
+                await fetch(`${API_URL}/pedidos/${id}`, { method: "DELETE", headers: {usuario:"admin", senha:"1234"} });
+                carregarPedidos();
+            }
+        }
+
+        async function carregarVendas() {
+            try {
+                const res = await fetch(`${API_URL}/vendas`);
+                const vendas = await res.json();
+                const tbody = document.getElementById("tabela-vendas");
+                tbody.innerHTML = "";
+                let total = 0;
+                vendas.forEach(v => {
+                    total += Number(v.valor);
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>#${v.id}</td><td>${new Date(v.data).toLocaleString()}</td><td style="text-align:right; color:#27ae60;">R$ ${Number(v.valor).toFixed(2)}</td>`;
+                    tbody.appendChild(tr);
+                });
+                document.getElementById("vendas-total-geral").innerText = "R$ " + total.toFixed(2);
+            } catch(e) { console.error(e); }
+        }
+
+        // MODAL DETALHES
+        const modal = document.getElementById("modal-detalhes");
+        function fecharModal() { modal.style.display = "none"; }
+        window.onclick = (e) => { if (e.target == modal) fecharModal(); }
+
+        async function abrirDetalhes(id) {
+            try {
+                const res = await fetch(`${API_URL}/pedidos/${id}`);
+                const p = await res.json();
+                const cli = p.cliente || {};
+                document.getElementById("modal-id").innerText = "#" + p.id;
+                document.getElementById("modal-total").innerText = "R$ " + (p.valorTotal ? p.valorTotal.toFixed(2) : "0.00");
+                document.getElementById("modal-info-cliente").innerHTML = `<div>👤 ${cli.nome || "-"}</div><div>📞 ${cli.telefone || "-"}</div><div>📍 ${cli.endereco || "-"}</div>`;
+                
+                const lista = document.getElementById("modal-lista-itens");
+                lista.innerHTML = "";
+                if(p.produtos && p.produtos.length > 0) {
+                    p.produtos.forEach(prod => {
+                        const li = document.createElement("li");
+                        li.style.cssText = "display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #444;";
+                        li.innerHTML = `<span><b>${prod.quantidade||0}x</b> ${prod.nome}</span><span>R$ ${((prod.valor||0)*(prod.quantidade||0)).toFixed(2)}</span>`;
+                        lista.appendChild(li);
+                    });
+                } else { lista.innerHTML = "<p style='text-align:center; color:#666'>Sem itens</p>"; }
+                modal.style.display = "block";
+            } catch(e) { alert("Erro ao abrir detalhes"); }
+        }
+
+        // Iniciar na tela de produtos para testar
+        mostrarSecao('produtos');
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Produtos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Gerenciar Produtos</h1>
+
+    <nav>
+        <button onclick="location.href='index.html'">Pedidos</button>
+        <button onclick="location.href='produtos.html'">Produtos</button>
+        <button onclick="location.href='login.html'">Sair</button>
+    </nav>
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+        <input id="nome" placeholder="Nome do produto">
+        <input id="valor" placeholder="Valor" type="number">
+        <input id="tipo" placeholder="Tipo">
+        <button id="btn-add">Adicionar</button>
+    </div>
+
+    <ul id="lista-produtos"></ul>
+
+    <script type="module" src="produtos.js"></script>
+    <script type="module">
+        import { verificarLogin } from "./auth.js";
+        verificarLogin();
+    </script>
+
+</body>
+</html>

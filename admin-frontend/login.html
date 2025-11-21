@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Pizzaria</title>
+    <style>
+        /* --- ESTILO VISUAL (Igual ao do Cliente) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212; /* Fundo Escuro */
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Centraliza na tela inteira */
+        }
+
+        .login-container {
+            background-color: #1e1e1e; /* Card Escuro */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 350px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 1.8em;
+        }
+
+        p {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* Inputs */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #007acc;
+            outline: none;
+            background: #333;
+        }
+
+        /* Botão */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            background-color: #007acc; /* Azul padrão do sistema */
+            color: white;
+        }
+
+        button:hover {
+            background-color: #005f9e;
+            transform: scale(1.02);
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <span class="logo">🔒</span>
+        <h1>Painel Admin</h1>
+        <p>Acesso restrito aos gerentes</p>
+
+        <form id="form-login">
+            <input type="text" id="usuario" placeholder="Usuário" autocomplete="username" required>
+            <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" required>
+            <button type="submit">Entrar no Sistema</button>
+        </form>
+    </div>
+
+    <script type="module" src="auth.js"></script>
+</body>
+</html>
