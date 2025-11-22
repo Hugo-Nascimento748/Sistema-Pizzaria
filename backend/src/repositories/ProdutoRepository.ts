@@ -2,6 +2,7 @@
 import { pool } from "../database/db";
 import { Produto } from "../models/Produto";
 
+
 export class ProdutoRepository {
 
     static async criar(produto: Produto) {
