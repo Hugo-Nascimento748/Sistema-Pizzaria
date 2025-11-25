@@ -9,10 +9,10 @@ escalável.
 
 ## 👥️ Integrantes
 
--   Hugo Nascimento Gonçalves - RA: 2509669\
--   Stefano de Paola Garcia Garcia Scuderi - RA: 2503418\
--   Alex Sandro Teles Silveira - RA: 2510122\
--   Pedro Pereira de Oliveira - RA: 2505860\
+-   Hugo Nascimento Gonçalves - RA: 2509669
+-   Stefano de Paola Garcia Garcia Scuderi - RA: 2503418
+-   Alex Sandro Teles Silveira - RA: 2510122
+-   Pedro Pereira de Oliveira - RA: 2505860
 -   Caio Felipe Martins de Camargo - RA: 2522475
 
 ------------------------------------------------------------------------
@@ -24,16 +24,16 @@ permissões distintas:
 
 ### 👤 Cliente
 
--   Cadastrar cliente\
--   Fazer login\
+-   Cadastrar cliente
+-   Fazer login
 -   Criar pedido
 
 ### 🛠️ Admin
 
--   Fazer login\
--   Adicionar produto\
--   Editar produto\
--   Remover produto\
+-   Fazer login
+-   Adicionar produto
+-   Editar produto
+-   Remover produto
 -   Confirmar pedido para o histórico de vendas
 
 ------------------------------------------------------------------------
@@ -53,7 +53,7 @@ com persistência completa.
 ### 🌐 Frontend Cliente
 
 Interface onde o usuário visualiza cardápio, cria pedidos e acompanha
-sua experiência.\
+sua experiência.
 Atualmente rodando via:
 
 ------------------------------------------------------------------------
@@ -81,11 +81,11 @@ Atualmente rodando via:
 
 ## 📦 Tecnologias Utilizadas
 
--   *TypeScript*\
--   *Node.js*\
--   *PostgreSQL*\
--   *pg / pg-promise*\
--   *readline-sync*\
+-   *TypeScript*
+-   *Node.js*
+-   *PostgreSQL*
+-   *pg / pg-promise*
+-   *readline-sync*
 -   *live-server*
 
 ------------------------------------------------------------------------
@@ -138,6 +138,6 @@ live-server
 ## 📌 Observações
 
 -   A arquitetura está modularizada e pronta para evoluir para um
-    ambiente cloud ou microserviços futuramente.\
+    ambiente cloud ou microserviços futuramente.
 -   A separação Cliente/Admin garante segurança e organização da
     operação.
