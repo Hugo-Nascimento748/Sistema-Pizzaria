@@ -1,235 +1,157 @@
 const API_URL = "http://localhost:3000";
 
-// Proteção: Se não tiver login, manda voltar
-if (!localStorage.getItem("auth")) {
-    window.location.href = "login.html";
+if (!localStorage.getItem("auth")) { window.location.href = "login.html"; }
+document.getElementById("btn-sair").addEventListener("click", () => {
+    localStorage.removeItem("auth"); window.location.href = "login.html";
+});
+
+function mudarTela(telaId) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tela-' + telaId).classList.add('ativa');
+    
+    if(telaId === 'pedidos') { document.querySelectorAll('.nav-btn')[0].classList.add('active'); carregarPedidos(); }
+    if(telaId === 'produtos') { document.querySelectorAll('.nav-btn')[1].classList.add('active'); carregarProdutos(); }
+    if(telaId === 'vendas') { document.querySelectorAll('.nav-btn')[2].classList.add('active'); carregarVendas(); }
 }
 
-// --- ELEMENTOS DO DOM ---
-const listaPedidos = document.getElementById("lista-pedidos");
-const modal = document.getElementById("modal-detalhes");
-const spanClose = document.getElementsByClassName("close")[0];
-const btnFechar = document.getElementById("btn-fechar-modal");
-
-// --- CONFIGURAÇÃO DO MODAL ---
-if (spanClose) spanClose.onclick = () => modal.style.display = "none";
-if (btnFechar) btnFechar.onclick = () => modal.style.display = "none";
-// Fecha se clicar fora da janela
-window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; }
-
-// --- BOTÕES DO MENU E AÇÕES ---
-const btnTeste = document.getElementById("btn-teste");
-if (btnTeste) {
-    btnTeste.addEventListener("click", async () => {
-        const res = await fetch(`${API_URL}/debug/seed`, { method: "POST" });
-        if(res.ok) { alert("Pedido Criado!"); carregarPedidos(); }
-        else alert("Erro ao criar pedido de teste");
-    });
-}
-
-document.getElementById("logout").addEventListener("click", () => {
-    localStorage.removeItem("auth");
-    window.location.href = "login.html";
-});
-
-// Alternar Abas
-document.getElementById("btn-produtos").addEventListener("click", () => {
-    document.getElementById("secao-pedidos").style.display = "none";
-    document.getElementById("secao-produtos").style.display = "block";
-    carregarProdutos();
-});
-document.getElementById("btn-pedidos").addEventListener("click", () => {
-    document.getElementById("secao-produtos").style.display = "none";
-    document.getElementById("secao-pedidos").style.display = "block";
-    carregarPedidos();
-});
-
-
-// ============================================================
-// 1. LISTAGEM DE PEDIDOS (Tela Principal)
-// ============================================================
+// --- PEDIDOS (MOSTRANDO PAGAMENTO CORRETAMENTE) ---
 async function carregarPedidos() {
     try {
         const res = await fetch(`${API_URL}/pedidos`);
         const pedidos = await res.json();
-
-        listaPedidos.innerHTML = "";
-
-        if (pedidos.length === 0) {
-            listaPedidos.innerHTML = "<p style='color:#ccc; padding:10px;'>Nenhum pedido encontrado.</p>";
-            return;
-        }
+        const lista = document.getElementById("lista-pedidos");
+        lista.innerHTML = "";
+        
+        if (pedidos.length === 0) return lista.innerHTML = "<p style='color:#777; text-align:center; width:100%'>Nenhum pedido pendente.</p>";
 
         pedidos.forEach(p => {
-            const li = document.createElement("li");
-            li.className = "pedido-card";
-            // Estilo Inline para garantir visual
-            li.style.cssText = "border: 1px solid #444; padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; background: #222; color: white; border-radius: 8px;";
-
-            li.innerHTML = `
-                <div>
-                    <strong style="font-size:1.2em; color: #ff4d4d;">Pedido #${p.id}</strong>
-                    <br>Cliente: ${p.cliente.nome}
-                    <br><small style="color:#aaa">${new Date(p.data).toLocaleString()}</small>
-                </div>
-                <div style="text-align:right">
-                    <div style="font-weight:bold; color:#4CAF50; margin-bottom: 10px;">R$ ${p.valorTotal.toFixed(2)}</div>
-                    
-                    <button class="btn-detalhes" data-id="${p.id}" 
-                        style="background:blue; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:4px; margin-right:5px;">
-                        Ver Detalhes
-                    </button>
-                    
-                    <button class="btn-remover" data-id="${p.id}" 
-                        style="background:red; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:4px;">
-                        X
-                    </button>
-                </div>
-            `;
-            listaPedidos.appendChild(li);
-        });
-    } catch (err) {
-        console.error("Erro ao listar pedidos:", err);
-        listaPedidos.innerHTML = "<p style='color:red'>Erro de conexão com o servidor.</p>";
-    }
-}
-
-// ============================================================
-// 2. AÇÕES DE CLIQUE (Delegação de Eventos)
-// ============================================================
-listaPedidos.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-
-    // Botão Remover
-    if (e.target.classList.contains("btn-remover")) {
-        if (confirm(`Tem certeza que deseja excluir o Pedido #${id}?`)) {
-            try {
-                await fetch(`${API_URL}/pedidos/${id}`, {
-                    method: "DELETE",
-                    headers: { usuario: "admin", senha: "1234" }
-                });
-                carregarPedidos(); // Atualiza a lista
-            } catch (err) { alert("Erro ao remover."); }
-        }
-    }
-
-    // Botão Detalhes
-    if (e.target.classList.contains("btn-detalhes")) {
-        abrirDetalhes(id);
-    }
-});
-
-
-// ============================================================
-// 3. FUNÇÃO DO MODAL (Detalhes do Pedido)
-// ============================================================
-async function abrirDetalhes(id) {
-    try {
-        console.log("Buscando detalhes do ID:", id);
-        
-        const res = await fetch(`${API_URL}/pedidos/${id}`);
-        if (!res.ok) {
-            alert("Erro ao buscar dados do pedido.");
-            return;
-        }
-        
-        const p = await res.json();
-        console.log("Dados recebidos:", p);
-
-        // --- PREENCHENDO O MODAL ---
-        
-        // Cabeçalho e Totais
-        document.getElementById("modal-id").innerText = "#" + (p.id || "0");
-        document.getElementById("modal-total").innerText = "R$ " + (p.valorTotal ? p.valorTotal.toFixed(2) : "0.00");
-
-        // Informações do Cliente (Com proteção contra nulos)
-        const cliente = p.cliente || {};
-        document.getElementById("modal-info-cliente").innerHTML = `
-            <p><strong>Cliente:</strong> ${cliente.nome || "Não informado"}</p>
-            <p><strong>Telefone:</strong> ${cliente.telefone || "Não informado"}</p>
-            <p><strong>Endereço:</strong> ${cliente.endereco || "Não informado"}</p>
-        `;
-
-        // Lista de Itens
-        const ulItens = document.getElementById("modal-lista-itens");
-        ulItens.innerHTML = "";
-        
-        if (p.produtos && Array.isArray(p.produtos) && p.produtos.length > 0) {
-            p.produtos.forEach(prod => {
-                // ATENÇÃO: Aqui usamos 'quantidade' que é o padrão novo do Backend
-                const qtd = prod.quantidade || 0;
-                const nome = prod.nome || "Produto sem nome";
-                const valor = Number(prod.valor || 0);
-
-                const li = document.createElement("li");
-                li.style.cssText = "border-bottom: 1px solid #444; padding: 8px 0; display:flex; justify-content:space-between; color: white;";
-                
-                li.innerHTML = `
-                    <span>${qtd}x ${nome}</span>
-                    <span>R$ ${(valor * qtd).toFixed(2)}</span>
-                `;
-                ulItens.appendChild(li);
-            });
-        } else {
-            ulItens.innerHTML = "<p style='color:#aaa; font-style:italic; text-align:center;'>Nenhum item neste pedido.</p>";
-        }
-
-        // Exibe o modal
-        modal.style.display = "block";
-
-    } catch (err) {
-        console.error("Erro no Modal:", err);
-        alert("Erro ao abrir a janela de detalhes.");
-    }
-}
-
-
-// ============================================================
-// 4. FUNÇÕES DE PRODUTOS
-// ============================================================
-async function carregarProdutos() {
-    try {
-        const res = await fetch(`${API_URL}/produtos`);
-        const produtos = await res.json();
-        const lista = document.getElementById("lista-produtos");
-        if (lista) {
-            lista.innerHTML = "";
-            produtos.forEach(p => {
-                const li = document.createElement("li");
-                li.innerHTML = `<strong>${p.nome}</strong> - R$${p.valor} <button class="deletar" data-id="${p.id}">Excluir</button>`;
-                lista.appendChild(li);
-            });
+            const card = document.createElement("div");
+            card.className = "card-pedido";
             
-            // Reativar botões de excluir produto
-            document.querySelectorAll(".deletar").forEach(btn => {
-                btn.addEventListener("click", async (e) => {
-                    const id = e.target.dataset.id;
-                    await fetch(`${API_URL}/produtos/${id}`, { method: "DELETE", headers: {usuario:"admin", senha:"1234"} });
-                    carregarProdutos();
-                });
-            });
-        }
-    } catch (err) { console.error(err); }
+            // ÍCONES DE PAGAMENTO
+            let icone = "💵";
+            let txtPagamento = p.formaPagamento || "Dinheiro"; // Usa o que veio do banco ou Dinheiro se nulo
+            
+            if(txtPagamento.includes("Pix")) icone = "💠";
+            if(txtPagamento.includes("Cartão")) icone = "💳";
+
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between;">
+                    <h3>#${p.id}</h3>
+                    <span style="background:#333; padding:2px 8px; border-radius:4px; font-size:0.85em;">${icone} ${txtPagamento}</span>
+                </div>
+                <div>👤 ${p.cliente.nome}</div>
+                <div style="font-size:0.9em; color:#aaa;">🕒 ${new Date(p.data).toLocaleTimeString()}</div>
+                <div style="font-weight:bold; color:#27ae60; margin:10px 0;">R$ ${p.valorTotal.toFixed(2)}</div>
+                <div class="acoes-pedido">
+                    <button class="btn-detalhes" onclick="abrirDetalhes(${p.id})">Ver Itens</button>
+                    <button class="btn-concluir" onclick="concluirPedido(${p.id})">✅ Pronto</button>
+                </div>`;
+            lista.appendChild(card);
+        });
+    } catch (e) { console.error(e); }
 }
 
-const formProduto = document.getElementById("form-produto");
-if (formProduto) {
-    formProduto.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const nome = document.getElementById("nome").value;
-        const valor = document.getElementById("valor").value;
-        const tipo = document.getElementById("tipo").value;
-        
-        await fetch(`${API_URL}/produtos`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json", usuario:"admin", senha:"1234"},
-            body: JSON.stringify({ nome, valor: Number(valor), tipo })
-        });
-        formProduto.reset();
-        carregarProdutos();
-        alert("Produto adicionado!");
+async function concluirPedido(id) {
+    if(!confirm("Finalizar pedido?")) return;
+    await fetch(`${API_URL}/pedidos/${id}`, { method: "DELETE" });
+    carregarPedidos();
+}
+
+// --- PRODUTOS ---
+async function carregarProdutos() {
+    const res = await fetch(`${API_URL}/produtos`);
+    const produtos = await res.json();
+    const lista = document.getElementById("lista-produtos");
+    lista.innerHTML = "";
+    produtos.forEach(p => {
+        lista.innerHTML += `<div><span><strong>${p.nome}</strong> - R$ ${p.valor} (${p.tipo})</span>
+        <div><button class="btn-edit" onclick="editarProduto(${p.id}, '${p.nome}', ${p.valor}, '${p.tipo}')">✏️</button>
+        <button class="btn-del" onclick="deletarProduto(${p.id})">🗑️</button></div></div>`;
     });
 }
+document.getElementById("form-produto").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("prod-id").value;
+    const nome = document.getElementById("prod-nome").value;
+    const valor = document.getElementById("prod-valor").value;
+    const tipo = document.getElementById("prod-tipo").value;
+    const url = id ? `${API_URL}/produtos/${id}` : `${API_URL}/produtos`;
+    const method = id ? "PUT" : "POST";
+    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nome, valor: Number(valor), tipo }) });
+    limparFormProduto(); carregarProdutos();
+});
+function editarProduto(id, nome, valor, tipo) {
+    document.getElementById("prod-id").value = id;
+    document.getElementById("prod-nome").value = nome;
+    document.getElementById("prod-valor").value = valor;
+    document.getElementById("prod-tipo").value = tipo;
+}
+function limparFormProduto() { document.getElementById("form-produto").reset(); document.getElementById("prod-id").value = ""; }
+async function deletarProduto(id) { if(confirm("Excluir?")) { await fetch(`${API_URL}/produtos/${id}`, { method: "DELETE" }); carregarProdutos(); } }
 
-// Inicialização
+// --- VENDAS (FILTROS + TOTAL GERAL) ---
+async function carregarVendas() {
+    const res = await fetch(`${API_URL}/vendas`);
+    let vendas = await res.json();
+    
+    const filtroDia = document.getElementById("filtro-dia").value;
+    const filtroMes = document.getElementById("filtro-mes").value;
+    const labelTotal = document.getElementById("label-total");
+
+    // LÓGICA DE FILTRAGEM
+    if (filtroDia) {
+        vendas = vendas.filter(v => v.data.startsWith(filtroDia));
+        labelTotal.innerText = `TOTAL DO DIA (${new Date(filtroDia).toLocaleDateString()})`;
+    } else if (filtroMes) {
+        vendas = vendas.filter(v => v.data.startsWith(filtroMes));
+        labelTotal.innerText = `TOTAL DO MÊS (${filtroMes})`;
+    } else {
+        labelTotal.innerText = "TOTAL GERAL (TODO O PERÍODO)";
+    }
+
+    const tbody = document.getElementById("tabela-vendas-body");
+    tbody.innerHTML = "";
+    let total = 0;
+    
+    // Inverter ordem (mais recente primeiro)
+    vendas.reverse();
+
+    if(vendas.length === 0) tbody.innerHTML = "<tr><td colspan='4' style='text-align:center'>Nenhum registro encontrado.</td></tr>";
+
+    vendas.forEach(v => {
+        total += Number(v.valor);
+        tbody.innerHTML += `<tr><td>#${v.id}</td><td>${new Date(v.data).toLocaleString()}</td>
+        <td>${v.formaPagamento || 'Dinheiro'}</td><td>R$ ${Number(v.valor).toFixed(2)}</td></tr>`;
+    });
+    document.getElementById("total-vendas").innerText = "R$ " + total.toFixed(2);
+}
+
+// NOVA FUNÇÃO: VER TOTAL GERAL
+function verTotalGeral() {
+    document.getElementById("filtro-dia").value = "";
+    document.getElementById("filtro-mes").value = "";
+    carregarVendas();
+}
+
+function limparFiltros() {
+    document.getElementById("filtro-dia").value = "";
+    document.getElementById("filtro-mes").value = "";
+    carregarVendas();
+}
+
+// --- MODAL ---
+const modal = document.getElementById("modal");
+function fecharModal() { modal.style.display = "none"; }
+async function abrirDetalhes(id) {
+    const res = await fetch(`${API_URL}/pedidos/${id}`);
+    const p = await res.json();
+    document.getElementById("modal-titulo").innerText = "Pedido #" + p.id;
+    document.getElementById("modal-cliente").innerHTML = `<p>${p.cliente.nome}<br>${p.cliente.endereco}</p>`;
+    document.getElementById("modal-itens").innerHTML = p.produtos.map(pr => `<li>${pr.quantidade}x ${pr.nome}</li>`).join('');
+    document.getElementById("modal-total").innerText = "Total: R$ " + p.valorTotal.toFixed(2);
+    modal.style.display = "block";
+}
+
 carregarPedidos();

@@ -7,6 +7,7 @@ export interface Pedido {
     data: Date;
     valorTotal: number;
     status?: string;
+    formaPagamento?: string;
     produtos: {
         id: number;
         nome: string;

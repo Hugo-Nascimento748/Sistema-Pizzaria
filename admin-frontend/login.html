@@ -4,104 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Pizzaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILO VISUAL (Igual ao do Cliente) --- */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212; /* Fundo Escuro */
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2c3e50 100%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Centraliza na tela inteira */
+            margin: 0;
         }
-
-        .login-container {
-            background-color: #1e1e1e; /* Card Escuro */
+        .login-card {
+            background: white;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 350px;
-            border: 1px solid #333;
             text-align: center;
         }
-
-        h1 {
-            margin: 0 0 10px 0;
-            color: #fff;
-            font-size: 1.8em;
-        }
-
-        p {
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-
-        /* Inputs */
+        .logo { font-size: 3rem; margin-bottom: 10px; display: block; }
+        h1 { color: #2c3e50; margin: 0 0 5px 0; }
+        p { color: #7f8c8d; margin-bottom: 30px; font-size: 0.9rem; }
+        
         input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1em;
-            transition: 0.3s;
+            width: 100%; padding: 12px; margin: 10px 0;
+            border: 1px solid #ddd; border-radius: 8px;
+            box-sizing: border-box; font-family: inherit;
         }
-
-        input:focus {
-            border-color: #007acc;
-            outline: none;
-            background: #333;
-        }
-
-        /* Botão */
+        input:focus { border-color: #3498db; outline: none; }
+        
         button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            background-color: #007acc; /* Azul padrão do sistema */
-            color: white;
+            width: 100%; padding: 12px; margin-top: 20px;
+            border: none; border-radius: 8px;
+            background: #2c3e50; color: white;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
         }
-
-        button:hover {
-            background-color: #005f9e;
-            transform: scale(1.02);
-        }
-
-        .logo {
-            font-size: 3em;
-            margin-bottom: 10px;
-            display: block;
-        }
+        button:hover { background: #34495e; transform: translateY(-2px); }
     </style>
 </head>
 <body>
-
-    <div class="login-container">
-        <span class="logo">🔒</span>
-        <h1>Painel Admin</h1>
-        <p>Acesso restrito aos gerentes</p>
-
+    <div class="login-card">
+        <span class="logo">👨‍🍳</span>
+        <h1>Admin</h1>
+        <p>Painel de Gerenciamento</p>
         <form id="form-login">
-            <input type="text" id="usuario" placeholder="Usuário" autocomplete="username" required>
-            <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" required>
-            <button type="submit">Entrar no Sistema</button>
+            <input type="text" id="usuario" placeholder="Usuário" required>
+            <input type="password" id="senha" placeholder="Senha" required>
+            <button type="submit">Acessar Sistema</button>
         </form>
     </div>
-
-    <script type="module" src="auth.js"></script>
+    <script>
+        document.getElementById("form-login").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const u = document.getElementById("usuario").value;
+            const s = document.getElementById("senha").value;
+            if(u === "admin" && s === "1234") {
+                localStorage.setItem("auth", "true");
+                window.location.href = "index.html";
+            } else { alert("Dados incorretos!"); }
+        });
+    </script>
 </body>
 </html>

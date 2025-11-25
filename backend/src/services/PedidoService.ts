@@ -2,9 +2,6 @@ import { PedidoRepository } from "../repositories/PedidoRepository";
 
 export class PedidoService {
 
-    // A função do Service agora é apenas chamar o Repository
-    // Isso mantém o código organizado e evita o erro de importação
-
     async listarPedidos() {
         return await PedidoRepository.listar();
     }
@@ -17,7 +14,14 @@ export class PedidoService {
         return await PedidoRepository.remover(id);
     }
 
-    async criarPedido(clienteId: number, produtos: any[]) {
-        return await PedidoRepository.criar(clienteId, produtos);
+    // --- ATENÇÃO AQUI ---
+    // A função PRECISA receber (clienteId, produtos, formaPagamento)
+    async criarPedido(clienteId: number, produtos: any[], formaPagamento: string) {
+        
+        // Debug para você ver no terminal se chegou aqui
+        console.log("Service recebeu pagamento:", formaPagamento);
+
+        // E precisa REPASSAR para o Repository
+        return await PedidoRepository.criar(clienteId, produtos, formaPagamento);
     }
 }
